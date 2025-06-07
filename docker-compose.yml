@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  ngrok:
+    image: ngrok/ngrok
+    command: http app:80 --url=duck-cute-ox.ngrok-free.app
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    ports:
+      - 4040:4040
+
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    environment:
+      - REDIS=redis://10.13.13.2:30204
+    ports:
+      - "8080:80"
