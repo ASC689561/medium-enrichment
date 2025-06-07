@@ -124,3 +124,4 @@ if __name__ == "__main__":
             break
         except:
             logging.exception("Error when fetch data", exc_info=True)
+            time.sleep(120)
