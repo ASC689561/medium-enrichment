@@ -14,7 +14,7 @@ r = redis.Redis(host="10.13.13.2", port=30204, decode_responses=True)
 @app.post("/slack/interact")
 async def slack_interact(payload: str = Form(...)):
     data = json.loads(payload)
-    action, task_id = data["actions"][0]["value"].split("|")  # 'approve' hoặc 'reject'
+    action, task_id = data["actions"][0]["value"].split("|")
     user = data["user"]["username"]
     logging.warning(f"{user} chọn {action} task_id {task_id}")
 
@@ -23,7 +23,6 @@ async def slack_interact(payload: str = Form(...)):
     elif action == "reject":
         r.set(task_id, "rejected")
 
-    # Gửi message trả lời về Slack
     response_url = data["response_url"]
     async with httpx.AsyncClient() as client:
         await client.post(
@@ -31,18 +30,16 @@ async def slack_interact(payload: str = Form(...)):
             json={"text": f"✅ {user} choose: {action}", "replace_original": False},
         )
 
-    return {"text": f"✅ Bạn đã chọn: {action}"}
+    return {"text": f"✅ You choose: {action}"}
 
 
 @app.post("/")
 async def slack_events(request: Request):
     data = await request.json()
-
-    # Xử lý bước verify từ Slack
+    
     if "challenge" in data:
         return JSONResponse(content={"challenge": data["challenge"]})
 
-    # Log các event gửi từ Slack
     print("Slack event received:", data)
 
     return JSONResponse(status_code=200, content={})

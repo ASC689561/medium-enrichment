@@ -29,14 +29,6 @@ r = redis.Redis(host="10.13.13.2", port=30204, decode_responses=True)
 send_message("Started bot ")
 
 
-def check_should_reply(text):
-    response = client.responses.create(
-        model="gpt-4.1",
-        input=f"""With the Reddit post title "{text}", should I post the link to the article "Use MT5 in Linux with Docker and Python"? Just answer yes or no.""",
-    )
-    rich.print(text, " ==> ", response.output_text)
-    return "có" in response.output_text.lower()
-
 
 def generate_reply(title):
     post_titles = list(df["Title"].values)
@@ -79,7 +71,7 @@ subreddits = [
 
 def run_bot():
     for submission in reddit.subreddit("+".join(subreddits)).stream.submissions(
-        skip_existing=True
+        skip_existing=False
     ):
         try:
             title = submission.title
@@ -108,7 +100,7 @@ def run_bot():
                 print(f"[!] Rejected by admin for: {submission.id}")
             else:
                 print(f"[!] Timeout waiting approval for: {submission.id}")
-            send_message("Reply done: " + str(e))
+            send_message("Reply done: ")
             time.sleep(15)
         except Exception as e:
             print(f"[!] Error: {e}")
